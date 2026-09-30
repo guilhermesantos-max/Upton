@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Vendas 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --panel-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #777777;
+            --excel-header: #f3f2f1;
+            --excel-border: #d2d2d2;
+            --excel-green: #217346;
+            --accent-color: #4a90e2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Excel Panel (Left Side) --- */
+        .excel-panel {
+            flex: 0 0 35%;
+            background: var(--panel-bg);
+            border: 1px solid var(--excel-border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .excel-header-bar {
+            background-color: var(--excel-green);
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid var(--excel-border);
+            padding: 6px 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: var(--excel-header);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .excel-tabs {
+            background-color: var(--excel-header);
+            border-top: 1px solid var(--excel-border);
+            padding: 5px 10px;
+            display: flex;
+        }
+
+        .tab-active {
+            background: white;
+            padding: 5px 15px;
+            border: 1px solid var(--excel-border);
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 13px;
+            color: var(--excel-green);
+            border-radius: 4px 4px 0 0;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.02);
+        }
+
+        /* --- Dashboard Panel (Center & Right) --- */
+        .dashboard-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .kpi-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .kpi-card {
+            flex: 1;
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .kpi-card:nth-child(2) { border-left-color: #27ae60; }
+        .kpi-card:nth-child(3) { border-left-color: #f39c12; }
+
+        .kpi-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+
+        .charts-row {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .chart-card {
+            background: var(--panel-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 250px;
+        }
+
+        .chart-card.wide {
+            flex: 2;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            flex: 1;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Dashboard de Vendas 2026</h1>
+
+    <div class="container">
+        <!-- Lado Esquerdo: Janela do Excel -->
+        <div class="excel-panel">
+            <div class="excel-header-bar">
+                📊 Microsoft Excel - Dados_Dashboard.xlsx
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Produto</th>
+                            <th>Região</th>
+                            <th>Quantidade</th>
+                            <th>Valor Unitário</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>02/01/2026</td><td>Software ERP</td><td>Norte</td><td>5</td><td>€ 1.500,00</td><td>€ 7.500,00</td></tr>
+                        <tr><td>15/01/2026</td><td>Licença Cloud</td><td>Sul</td><td>20</td><td>€ 120,00</td><td>€ 2.400,00</td></tr>
+                        <tr><td>10/02/2026</td><td>Hardware Servidor</td><td>Centro</td><td>2</td><td>€ 3.200,00</td><td>€ 6.400,00</td></tr>
+                        <tr><td>22/02/2026</td><td>Consultoria IT</td><td>Norte</td><td>10</td><td>€ 85,00</td><td>€ 850,00</td></tr>
+                        <tr><td>05/03/2026</td><td>Software ERP</td><td>Sul</td><td>8</td><td>€ 1.500,00</td><td>€ 12.000,00</td></tr>
+                        <tr><td>18/03/2026</td><td>Licença Cloud</td><td>Centro</td><td>50</td><td>€ 120,00</td><td>€ 6.000,00</td></tr>
+                        <tr><td>12/04/2026</td><td>Manutenção</td><td>Norte</td><td>1</td><td>€ 900,00</td><td>€ 900,00</td></tr>
+                        <tr><td>28/04/2026</td><td>Hardware Servidor</td><td>Sul</td><td>4</td><td>€ 3.200,00</td><td>€ 12.800,00</td></tr>
+                        <tr><td>09/05/2026</td><td>Consultoria IT</td><td>Centro</td><td>40</td><td>€ 85,00</td><td>€ 3.400,00</td></tr>
+                        <tr><td>14/06/2026</td><td>Software ERP</td><td>Norte</td><td>3</td><td>€ 1.500,00</td><td>€ 4.500,00</td></tr>
+                        <tr><td>21/07/2026</td><td>Licença Cloud</td><td>Sul</td><td>35</td><td>€ 120,00</td><td>€ 4.200,00</td></tr>
+                        <tr><td>03/08/2026</td><td>Manutenção</td><td>Centro</td><td>2</td><td>€ 900,00</td><td>€ 1.800,00</td></tr>
+                        <tr><td>11/09/2026</td><td>Consultoria IT</td><td>Norte</td><td>15</td><td>€ 85,00</td><td>€ 1.275,00</td></tr>
+                        <!-- Adicione mais linhas conforme necessário -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="excel-tabs">
+                <div class="tab-active">Vendas_2026</div>
+            </div>
+        </div>
+
+        <!-- Centro e Direita: Dashboard -->
+        <div class="dashboard-panel">
+            
+            <!-- KPIs -->
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-title">Receita Total</div>
+                    <div class="kpi-value">€ 1.245.890</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Unidades Vendidas</div>
+                    <div class="kpi-value">14.320</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Ticket Médio</div>
+                    <div class="kpi-value">€ 87,00</div>
+                </div>
+            </div>
+
+            <!-- Gráficos Linha 1 -->
+            <div class="charts-row">
+                <div class="chart-card wide">
+                    <div class="chart-title">Evolução Mensal de Vendas (2026)</div>
+                    <div class="chart-container">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title">Participação por Categoria</div>
+                    <div class="chart-container">
+                        <canvas id="doughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos Linha 2 -->
+            <div class="charts-row">
+                <div class="chart-card wide">
+                    <div class="chart-title">Vendas por Região e Produto</div>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts do Chart.js -->
+    <script>
+        // Configuração Global de Fonte do Chart.js
+        Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+
+        // 1. Gráfico de Linha (Evolução Mensal)
+        const ctxLine = document.getElementById('lineChart').getContext('2d');
+        new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                datasets: [{
+                    label: 'Receita (€)',
+                    data: [45000, 52000, 48000, 61000, 59000, 75000, 82000, 79000, 91000, 88000, 105000, 120000],
+                    borderColor: '#4a90e2',
+                    backgroundColor: 'rgba(74, 144, 226, 0.2)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // 2. Gráfico de Rosca (Participação por Categoria)
+        const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
+        new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Software ERP', 'Licenças Cloud', 'Hardware', 'Serviços/Consultoria'],
+                datasets: [{
+                    data: [40, 25, 20, 15],
+                    backgroundColor: ['#4a90e2', '#27ae60', '#f39c12', '#9b59b6'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+
+        // 3. Gráfico de Barras (Região e Produto)
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Norte', 'Centro', 'Sul', 'Ilhas'],
+                datasets: [
+                    {
+                        label: 'Software ERP',
+                        data: [15000, 22000, 18000, 5000],
+                        backgroundColor: '#4a90e2'
+                    },
+                    {
+                        label: 'Hardware',
+                        data: [8000, 12000, 9000, 2000],
+                        backgroundColor: '#f39c12'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: false },
+                    y: { stacked: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
